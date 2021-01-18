@@ -11,16 +11,21 @@ const urlDatabase = {
 
 
 app.get('/', (req, res) => { // => registers handler on root path ('/')
-  res.send('Hello!');
+  res.send('Tiny URL Project root page!');
+});
+
+app.get('/urls', (req, res) => { // => page displaying urls
+  const templateVars = {urls: urlDatabase };
+  res.render('urls_index', templateVars);
 });
 
 app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
 });
 
-app.get('/hello', (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
+// app.get('/hello', (req, res) => {
+//   res.send("<html><body>Hello <b>World</b></body></html>\n");
+// });
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
