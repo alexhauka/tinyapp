@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser')
 
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(cookieParser())
 app.set('view engine', 'ejs');
 
 function generateRandomString() {
@@ -21,8 +22,16 @@ app.get('/', (req, res) => { // => registers handler on root path ('/')
   res.send('Tiny URL Project root page!');
 });
 
+app.post('/login', (req, res) => {
+  res.cookie('username', req.body.username);
+  res.redirect('/urls')
+})
+
 app.get('/urls', (req, res) => { // => page displaying urls
-  const templateVars = {urls: urlDatabase };
+  const templateVars = {
+    urls: urlDatabase,
+    username: req.cookies['username']
+  };
   res.render('urls_index', templateVars);
 });
 
