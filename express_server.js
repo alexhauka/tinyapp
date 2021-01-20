@@ -40,6 +40,14 @@ app.get('/urls', (req, res) => { // => page displaying urls
   res.render('urls_index', templateVars);
 });
 
+app.get('/register', (req, res) => {
+  const templateVars = {
+    urls: urlDatabase,
+    username: req.cookies['username']
+  };
+  res.render('urls_register', templateVars);
+})
+
 app.post("/urls", (req, res) => {
   // console.log(req.body);  // Log the POST request body to the console
   let short = generateRandomString();
