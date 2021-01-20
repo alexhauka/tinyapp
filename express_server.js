@@ -52,9 +52,24 @@ app.get('/', (req, res) => { // => registers handler on root path ('/')
   res.send('Tiny URL Project root page!');
 });
 
+app.get('/login', (req, res) => {
+  let user = req.cookies['user_id'];
+  let userID = users[user]
+  const templateVars = {
+    userID,
+    urls: urlDatabase
+  }
+  res.render('urls_login', templateVars);
+})
+
 app.post('/login', (req, res) => {
-  res.cookie('username', req.body.username);
-  res.redirect('/urls');
+  let user = req.cookies['user_id'];
+  let userID = users[user]
+  const templateVars = {
+    userID,
+    urls: urlDatabase
+  }
+  res.render('urls_login', templateVars);
 });
 
 app.post('/logout', (req, res) => {
