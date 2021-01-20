@@ -34,7 +34,7 @@ const generateRandomString = function() { // => used for generating 6 char rando
 };
 
 
-const getUserByEmail = function(email) { // => returns user object with info  
+const getUserByEmail = function(email) { // => returns user object with related info 
   for (const user in users) {
     if (users[user].email === email) {
       return users[user];
