@@ -8,8 +8,12 @@
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-        <a class='nav-item nav-link' href='/login'>Log In</a>
         <a class="nav-item nav-link" href="/register">Register</a>
+        <% if (userID) { %>
+          <a class='nav-item nav-link' href='/logout'>Log Out</a>
+        <% } else { %>
+          <a class='nav-item nav-link' href='/login'>Log In</a>
+        <% } %>
       </div>
     </div>
   </nav>
