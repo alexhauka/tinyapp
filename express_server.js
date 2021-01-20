@@ -8,9 +8,6 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 app.set('view engine', 'ejs');
 
-const generateRandomString = function() {
-  return Math.floor((1 + Math.random()) * 0x100000).toString(16);
-};
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -29,6 +26,26 @@ const users = {
     password: "dishwasher-funk"
   }
 };
+
+// Helpers:
+
+const generateRandomString = function() { // => used for generating 6 char random string to assign as user id in database
+  return Math.floor((1 + Math.random()) * 0x100000).toString(16);
+};
+
+
+const checkForEmail = function(email) { // => returns true if email already exists for a user, false if not
+  let exists = false;
+  for (const user in users) {
+    if (users[user].email === email) {
+      exists = true;
+    }
+  }
+  return exists;
+};
+
+
+
 
 
 app.get('/', (req, res) => { // => registers handler on root path ('/')
@@ -66,15 +83,27 @@ app.get('/register', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
-  const randomID = generateRandomString();
-  users[randomID] = {
-    id: randomID,
-    email: req.body.email,
-    password: req.body.password
+  if (checkForEmail(req.body.email)) {
+    res.status(400).send('that email already exists!');
+  } else if (req.body.email === "" || req.body.password === "") {
+    res.status(400).send('email or password cannot be empty!');
+  } else {
+    const randomID = generateRandomString();
+    users[randomID] = {
+      id: randomID,
+      email: req.body.email,
+      password: req.body.password
+    };
+    res.cookie('user_id', randomID);
+    // console.log(users)
+    res.redirect('/urls');
   };
-  res.cookie('user_id', randomID);
-  res.redirect('/urls');
 });
+
+
+
+
+
 
 app.post("/urls", (req, res) => {
   // console.log(req.body);  // Log the POST request body to the console
