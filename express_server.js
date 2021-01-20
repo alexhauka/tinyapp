@@ -133,11 +133,15 @@ app.post("/urls", (req, res) => {
 app.get('/urls/new', (req, res) => {
   let user = req.cookies['user_id'];
   let userID = users[user]
-  const templateVars = {
-    userID,
-    urls: urlDatabase
+  if (!userID) {
+    res.redirect('/login')
+  } else {
+    const templateVars = {
+      userID,
+      urls: urlDatabase
+    }
+    res.render('urls_new', templateVars);
   }
-  res.render('urls_new', templateVars);
 });
 
 
