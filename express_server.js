@@ -46,18 +46,22 @@ app.post('/logout', (req, res) => {
 });
 
 app.get('/urls', (req, res) => { // => page displaying urls
+  let user = req.cookies['user_id'];
+  let userID = users[user]
   const templateVars = {
-    urls: urlDatabase,
-    username: req.cookies['username']
-  };
+    userID,
+    urls: urlDatabase
+  }
   res.render('urls_index', templateVars);
 });
 
 app.get('/register', (req, res) => {
+  let user = req.cookies['user_id'];
+  let userID = users[user]
   const templateVars = {
-    urls: urlDatabase,
-    username: req.cookies['username']
-  };
+    userID,
+    urls: urlDatabase
+  }
   res.render('urls_register', templateVars);
 });
 
@@ -81,20 +85,24 @@ app.post("/urls", (req, res) => {
 });
 
 app.get('/urls/new', (req, res) => {
+  let user = req.cookies['user_id'];
+  let userID = users[user]
   const templateVars = {
-    urls: urlDatabase,
-    username: req.cookies['username']
-  };
+    userID,
+    urls: urlDatabase
+  }
   res.render('urls_new', templateVars);
 });
 
 
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
+  let user = req.cookies['user_id'];
+  let userID = users[user]
   const templateVars = {
-    urls: urlDatabase,
-    username: req.cookies['username']
-  };
+    userID,
+    urls: urlDatabase
+  }
   res.redirect(longURL);
   res.render('/u/:shortURL', templateVars);
 });
@@ -105,11 +113,14 @@ app.post('/urls/:shortURL', (req, res) => {
 });
 
 app.get('/urls/:shortURL', (req, res) => {
+  let user = req.cookies['user_id'];
+  let userID = users[user]
   const templateVars = {
+    userID,
+    urls: urlDatabase,
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
-    username: req.cookies['username']
-  };
+  }
   res.render('urls_show', templateVars);
 });
 
