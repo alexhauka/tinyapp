@@ -10,8 +10,8 @@ app.set('view engine', 'ejs');
 
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID" },
+  "9sm5xK": { longURL: "http://www.google.com", userID: "user2RandomID" }
 };
 
 const users = {
@@ -146,15 +146,8 @@ app.get('/urls/new', (req, res) => {
 
 
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
-  let user = req.cookies['user_id'];
-  let userID = users[user];
-  const templateVars = {
-    userID,
-    urls: urlDatabase
-  };
+  const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
-  res.render('/u/:shortURL', templateVars);
 });
 
 app.post('/urls/:shortURL', (req, res) => {
