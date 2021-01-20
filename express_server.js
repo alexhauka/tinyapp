@@ -27,24 +27,22 @@ const users = {
   }
 };
 
-// Helpers:
+// ----------------Helpers-----------------:
 
 const generateRandomString = function() { // => used for generating 6 char random string to assign as user id in database
   return Math.floor((1 + Math.random()) * 0x100000).toString(16);
 };
 
 
-const checkForEmail = function(email) { // => returns true if email already exists for a user, false if not
-  let exists = false;
+const getUserByEmail = function(email) { // => returns user object with info  
   for (const user in users) {
     if (users[user].email === email) {
-      exists = true;
+      return users[user];
     }
   }
-  return exists;
 };
 
-
+// ----------------------------------------:
 
 
 
@@ -63,17 +61,19 @@ app.get('/login', (req, res) => {
 })
 
 app.post('/login', (req, res) => {
-  let user = req.cookies['user_id'];
-  let userID = users[user]
-  const templateVars = {
-    userID,
-    urls: urlDatabase
+  const userInfo = getUserByEmail(req.body.email);
+  if (!getUserByEmail(req.body.email)) {
+    res.status(403).send('that email is not in our database.');
+  } else if (userInfo.password !== req.body.password) {
+    res.status(403).send('password does not match!');
+  } else if (userInfo.password === req.body.password) {
+    res.cookie('user_id', userInfo.id)
+    res.redirect('/urls');
   }
-  res.render('urls_login', templateVars);
 });
 
 app.post('/logout', (req, res) => {
-  res.clearCookie('username', req.cookies);
+  res.clearCookie('user_id', req.cookies);
   res.redirect('/urls');
 });
 
@@ -97,8 +97,10 @@ app.get('/register', (req, res) => {
   res.render('urls_register', templateVars);
 });
 
+
+
 app.post('/register', (req, res) => {
-  if (checkForEmail(req.body.email)) {
+  if (getUserByEmail(req.body.email)) {
     res.status(400).send('that email already exists!');
   } else if (req.body.email === "" || req.body.password === "") {
     res.status(400).send('email or password cannot be empty!');
