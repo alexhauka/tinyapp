@@ -17,6 +17,19 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+  "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
+};
+
 
 app.get('/', (req, res) => { // => registers handler on root path ('/')
   res.send('Tiny URL Project root page!');
@@ -46,7 +59,18 @@ app.get('/register', (req, res) => {
     username: req.cookies['username']
   };
   res.render('urls_register', templateVars);
-})
+});
+
+app.post('/register', (req, res) => {
+  const randomID = generateRandomString();
+  users[randomID] = {
+    id: randomID,
+    email: req.body.email,
+    password: req.body.password
+  };
+  res.cookie('user_id', randomID);
+  res.redirect('/urls');
+});
 
 app.post("/urls", (req, res) => {
   // console.log(req.body);  // Log the POST request body to the console
