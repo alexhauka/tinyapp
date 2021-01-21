@@ -136,11 +136,9 @@ app.post('/register', (req, res) => {
 
 
 app.post("/urls", (req, res) => {
-  // console.log(req.body);  // Log the POST request body to the console
   let short = generateRandomString();
   urlDatabase[short] = req.body.longURL;
   res.redirect(`/urls/${short}`);
-  // console.log(urlDatabase)
 });
 
 app.get('/urls/new', (req, res) => {
@@ -170,15 +168,21 @@ app.post('/urls/:shortURL', (req, res) => {
 
 app.get('/urls/:shortURL', (req, res) => {
   let user = req.cookies['user_id'];
-  let userID = users[user];
-  const templateVars = {
-    userID,
-    urls: urlDatabase,
-    shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL],
-  };
-  res.render('urls_show', templateVars);
+  if (!user) {
+    res.redirect('/login');
+  } else {
+    let userID = users[user].id;
+    let userURLS = urlsForUser(userID);
+    const templateVars = {
+      userID,
+      urls: userURLS,
+      shortURL: req.params.shortURL,
+      longURL: urlDatabase[req.params.shortURL],
+    };
+    res.render('urls_show', templateVars);
+  }
 });
+
 
 app.post('/urls/:shortURL/delete', (req, res) => {
   delete urlDatabase[req.params.shortURL];
