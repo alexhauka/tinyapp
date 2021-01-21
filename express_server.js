@@ -162,7 +162,7 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 app.post('/urls/:shortURL', (req, res) => {
-  urlDatabase[req.params.shortURL] = req.body.longURL;
+  urlDatabase[req.params.shortURL].longURL = req.body.longURL;
   res.redirect('/urls');
 });
 
@@ -185,8 +185,15 @@ app.get('/urls/:shortURL', (req, res) => {
 
 
 app.post('/urls/:shortURL/delete', (req, res) => {
-  delete urlDatabase[req.params.shortURL];
-  res.redirect('/urls');
+  let user = req.cookies['user_id'];
+  let userID = users[user].id;
+  let userURLS = urlsForUser(userID);
+  if (userID === userURLS[req.params.shortURL].userID) {
+    delete urlDatabase[req.params.shortURL];
+    res.redirect('/urls');
+  } else {
+    res.send('not the owner: cannot delete.')
+  }
 });
 
 app.get('/urls.json', (req, res) => {
