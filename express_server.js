@@ -49,10 +49,10 @@ const urlsForUser = function(id) {
 }
 
 
-const getUserByEmail = function(email) { // => returns user object with related info
-  for (const user in users) {
-    if (users[user].email === email) {
-      return users[user];
+const getUserByEmail = function(email, db) { // => returns user object with related info
+  for (const user in db) {
+    if (db[user].email === email) {
+      return db[user];
     }
   }
 };
@@ -76,8 +76,9 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  const userInfo = getUserByEmail(req.body.email);
-  if (!getUserByEmail(req.body.email)) {
+  const userInfo = getUserByEmail(req.body.email, users);
+  // console.log(userInfo)
+  if (userInfo.email !== req.body.email) {
     res.status(403).send('that email is not in our database.');
   } else if (!bcrypt.compareSync(req.body.password, userInfo.password)) {
     res.status(403).send('password does not match!');
@@ -122,10 +123,10 @@ app.get('/register', (req, res) => {
 
 
 app.post('/register', (req, res) => {
-  if (getUserByEmail(req.body.email)) {
+  if (getUserByEmail(req.body.email, users)) {
     res.status(400).send('that email already exists!');
   } else if (req.body.email === "" || req.body.password === "") {
-    res.status(400).send('email or password cannot be empty!');
+    res.status(400).send('email and password cannot be empty!');
   } else {
     const randomID = generateRandomString();
     const password = req.body.password;
