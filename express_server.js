@@ -3,8 +3,10 @@ const cookieSession = require('cookie-session');
 const express = require('express');
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
+
 const app = express();
 const PORT = 8080;
+
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
   name: 'session',
@@ -20,14 +22,19 @@ const testDateFormatted1 = testDate1.toLocaleString('en-US');
 const testDate2 = new Date(Date.now());
 const testDateFormatted2 = testDate2.toLocaleString('en-US');
 
+
+// test database tied to test accounts:
 const urlDatabase = {
   "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID", dateFormatted: testDateFormatted1},
   "9sm5xK": { longURL: "http://www.google.com", userID: "user2RandomID", dateFormatted: testDateFormatted2}
 };
 
+
 // for logging in with test accounts:
 const testPassword1 = bcrypt.hashSync("purple-monkey-dinosaur", 10)
 const testPassword2 = bcrypt.hashSync("dishwasher-funk", 10)
+
+
 // two test accounts:
 const users = {
   "userRandomID": {
@@ -52,6 +59,7 @@ app.get('/', (req, res) => { // => registers handler on root path ('/')
   }
 });
 
+
 app.get('/urls', (req, res) => { // => page displaying urls
   let userKey = req.session.user_id;
   if (!userKey) {
@@ -66,6 +74,7 @@ app.get('/urls', (req, res) => { // => page displaying urls
     return res.render('urls_index', templateVars);
   }
 });
+
 
 app.get('/urls/new', (req, res) => {
   let userKey = req.session.user_id;
@@ -106,6 +115,7 @@ app.get('/urls/:shortURL', (req, res) => {
   }
 });
 
+
 app.get("/u/:shortURL", (req, res) => {
   if (!urlDatabase[req.params.shortURL]) {
     return res.sendStatus(404);
@@ -114,6 +124,7 @@ app.get("/u/:shortURL", (req, res) => {
     return res.redirect(longURL);
   };
 });
+
 
 app.post("/urls", (req, res) => {
   if (!req.session.user_id) {
@@ -132,6 +143,7 @@ app.post("/urls", (req, res) => {
   }
 });
 
+
 app.post('/urls/:shortURL', (req, res) => {
   if (!req.session.user_id) {
     return res.sendStatus(403);
@@ -147,6 +159,7 @@ app.post('/urls/:shortURL', (req, res) => {
     }
   }
 });
+
 
 app.post('/urls/:shortURL/delete', (req, res) => {
   if (!req.session.user_id) {
@@ -178,6 +191,7 @@ app.get('/login', (req, res) => {  // => template vars defaults to undefined if 
   }
 });
 
+
 app.get('/register', (req, res) => {
   if (req.session.user_id) {
     return res.redirect('/urls');
@@ -188,6 +202,7 @@ app.get('/register', (req, res) => {
     return res.render('urls_register', templateVars);
   }
 });
+
 
 app.post('/login', (req, res) => {
   const userInfo = getUserByEmail(req.body.email, users);
@@ -200,6 +215,7 @@ app.post('/login', (req, res) => {
     return res.redirect('/urls');
   }
 });
+
 
 app.post('/register', (req, res) => {
   if (getUserByEmail(req.body.email, users)) {
@@ -227,39 +243,15 @@ app.post('/logout', (req, res) => {
 });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
 });
 
 
-
-
 app.get('*', (req, res) => {
   return res.redirect('/login')
-})
+});
+
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
@@ -267,5 +259,5 @@ app.listen(PORT, () => {
 
 
 //---------------TO DO:---------------
-// change page templates to hide or show pertinent info depending on session status?
-// redesign header
+
+// redesign header end views (make em pretty!)
