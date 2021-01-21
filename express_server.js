@@ -201,24 +201,11 @@ app.post('/login', (req, res) => {
   }
 });
 
-app.post('/logout', (req, res) => {
-  req.session = null;
-  res.redirect('/urls');
-});
-
-
-
-
-
-
-
-
-
 app.post('/register', (req, res) => {
   if (getUserByEmail(req.body.email, users)) {
-    res.sendStatus(400);
+    return res.sendStatus(400);
   } else if (req.body.email === "" || req.body.password === "") {
-    res.sendStatus(400);
+    return res.sendStatus(400);
   } else {
     const randomID = generateRandomString();
     const password = req.body.password;
@@ -229,9 +216,25 @@ app.post('/register', (req, res) => {
       password: hashedPassword
     };
     req.session.user_id = randomID;
-    res.redirect('/urls');
+    return res.redirect('/urls');
   }
 });
+
+
+app.post('/logout', (req, res) => {
+  req.session = null;
+  return res.redirect('/urls');
+});
+
+
+
+
+
+
+
+
+
+
 
 
 
