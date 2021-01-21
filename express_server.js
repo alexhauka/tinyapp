@@ -1,11 +1,10 @@
 const { generateRandomString, urlsForUser, getUserByEmail } = require('./helpers');
+const cookieSession = require('cookie-session');
 const express = require('express');
 const bodyParser = require("body-parser");
-const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
 const app = express();
 const PORT = 8080;
-
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
   name: 'session',
@@ -15,9 +14,15 @@ app.use(cookieSession({
 app.set('view engine', 'ejs');
 
 
+// test date stamps for test account URLS:
+const testDate1 = new Date(Date.now())
+const testDateFormatted1 = testDate1.toLocaleString('en-US');
+const testDate2 = new Date(Date.now());
+const testDateFormatted2 = testDate2.toLocaleString('en-US');
+
 const urlDatabase = {
-  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID" },
-  "9sm5xK": { longURL: "http://www.google.com", userID: "user2RandomID" }
+  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID", dateFormatted: testDateFormatted1},
+  "9sm5xK": { longURL: "http://www.google.com", userID: "user2RandomID", dateFormatted: testDateFormatted2}
 };
 
 // for logging in with test accounts:
@@ -66,13 +71,13 @@ app.get('/urls/new', (req, res) => {
   let userKey = req.session.user_id;
   let userID = users[userKey];
   if (!userKey) {
-    res.redirect('/login');
+    return res.redirect('/login');
   } else {
     const templateVars = {
       userID,
       urls: urlDatabase
     };
-    res.render('urls_new', templateVars);
+    return res.render('urls_new', templateVars);
   }
 });
 
@@ -89,6 +94,7 @@ app.get('/urls/:shortURL', (req, res) => {
       urls: userURLS,
       shortURL: req.params.shortURL,
       longURL: urlDatabase[req.params.shortURL],
+      dateFormatted: urlDatabase[req.params.shortURL].dateFormatted
     };
     res.render('urls_show', templateVars);
   }
