@@ -17,7 +17,7 @@ app.set('view engine', 'ejs');
 
 
 // test date stamps for test account URLS:
-const testDate1 = new Date(Date.now())
+const testDate1 = new Date(Date.now());
 const testDateFormatted1 = testDate1.toLocaleString('en-US');
 const testDate2 = new Date(Date.now());
 const testDateFormatted2 = testDate2.toLocaleString('en-US');
@@ -31,8 +31,8 @@ const urlDatabase = {
 
 
 // for logging in with test accounts:
-const testPassword1 = bcrypt.hashSync("purple-monkey-dinosaur", 10)
-const testPassword2 = bcrypt.hashSync("dishwasher-funk", 10)
+const testPassword1 = bcrypt.hashSync("purple-monkey-dinosaur", 10);
+const testPassword2 = bcrypt.hashSync("dishwasher-funk", 10);
 
 
 // two test accounts:
@@ -55,7 +55,7 @@ app.get('/', (req, res) => { // => registers handler on root path ('/')
   if (req.session.user_id) {
     return res.redirect('/urls');
   } else {
-    return res.redirect('/login')
+    return res.redirect('/login');
   }
 });
 
@@ -122,7 +122,7 @@ app.get("/u/:shortURL", (req, res) => {
   } else {
     const longURL = urlDatabase[req.params.shortURL].longURL;
     return res.redirect(longURL);
-  };
+  }
 });
 
 
@@ -132,7 +132,7 @@ app.post("/urls", (req, res) => {
   } else {
     let userKey = req.session.user_id;
     const short = generateRandomString();
-    const dateStamp = new Date(Date.now())
+    const dateStamp = new Date(Date.now());
     const dateFormatted = dateStamp.toLocaleString('en-US');
     urlDatabase[short] = {
       userID : userKey,
@@ -173,8 +173,8 @@ app.post('/urls/:shortURL/delete', (req, res) => {
     } else {
       delete urlDatabase[req.params.shortURL];
       return res.redirect('/urls');
-    };
-  };
+    }
+  }
 });
 
 
@@ -184,10 +184,10 @@ app.get('/login', (req, res) => {  // => template vars defaults to undefined if 
     urls: urlDatabase
   };
   if (req.session.user_id) {
-    templateVars.userID = users[req.session.user_id] // => sets the userID to matching cookie for session
+    templateVars.userID = users[req.session.user_id];// => sets the userID to matching cookie for session
     return res.redirect('/urls');
   } else {
-    return res.render('urls_login', templateVars)
+    return res.render('urls_login', templateVars);
   }
 });
 
@@ -211,7 +211,7 @@ app.post('/login', (req, res) => {
   } else if (!bcrypt.compareSync(req.body.password, users[userInfo].password)) {
     return res.sendStatus(403);
   } else if (bcrypt.compareSync(req.body.password, users[userInfo].password)) {
-    req.session.user_id = users[userInfo].id;
+    req.session.user_id = users[userInfo].id; // => not camel case because cookie-session package and Compass said to do it this way.
     return res.redirect('/urls');
   }
 });
@@ -231,7 +231,7 @@ app.post('/register', (req, res) => {
       email: req.body.email,
       password: hashedPassword
     };
-    req.session.user_id = randomID;
+    req.session.user_id = randomID; // => not camel case because cookie-session package and Compass said to do it this way.
     return res.redirect('/urls');
   }
 });
@@ -249,7 +249,7 @@ app.get('/urls.json', (req, res) => {
 
 
 app.get('*', (req, res) => {
-  return res.redirect('/login')
+  return res.redirect('/login');
 });
 
 
@@ -261,3 +261,4 @@ app.listen(PORT, () => {
 //---------------TO DO:---------------
 
 // redesign header end views (make em pretty!)
+// lint all js files
