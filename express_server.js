@@ -148,29 +148,22 @@ app.post('/urls/:shortURL', (req, res) => {
   }
 });
 
-// app.get('/urls/:shortURL', (req, res) => {
-//   let userKey = req.session.user_id;
-//   if (!userKey) {
-//     res.redirect('/login');
-//   } else if (!urlDatabase[req.params.shortURL]) {
-//     return res.sendStatus(404);
-//   }  else {
-//     let searchID = users[userKey].id;
-//     let userURLS = urlsForUser(searchID, urlDatabase);
-//     if (!userURLS[req.params.shortURL]) {
-//       return res.sendStatus(403);
-//     } else {
-//       const templateVars = {
-//         userID : users[userKey],
-//         urls: userURLS,
-//         shortURL: req.params.shortURL,
-//         longURL: urlDatabase[req.params.shortURL],
-//         dateFormatted: urlDatabase[req.params.shortURL].dateFormatted
-//       };
-//       return res.render('urls_show', templateVars);
-//     }
-//   }
-// });
+app.post('/urls/:shortURL/delete', (req, res) => {
+  if (!req.session.user_id) {
+    return res.sendStatus(403);
+  } else {
+    let userKey = req.session.user_id;
+    let searchID = users[userKey].id;
+    let userURLS = urlsForUser(searchID, urlDatabase);
+    if (!userURLS[req.params.shortURL]) {
+      return res.sendStatus(403);
+    } else {
+      delete urlDatabase[req.params.shortURL];
+      return res.redirect('/urls');
+    };
+  };
+});
+
 
 
 // THIS ONE IS BEST, USE AS MODEL FOR REST
@@ -251,17 +244,7 @@ app.post('/register', (req, res) => {
 
 
 
-app.post('/urls/:shortURL/delete', (req, res) => {
-  let user = req.session.user_id;
-  let searchID = users[user].id;
-  let userURLS = urlsForUser(searchID, urlDatabase);
-  if (user === userURLS[req.params.shortURL].userID) {
-    delete urlDatabase[req.params.shortURL];
-    res.redirect('/urls');
-  } else {
-    res.send('not the owner: cannot delete.');
-  }
-});
+
 
 app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
