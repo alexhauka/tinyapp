@@ -123,14 +123,13 @@ app.post('/register', (req, res) => {
 
 app.post("/urls", (req, res) => {
   let userKey = req.session.user_id;
-  let short = generateRandomString();
-  let dateStamp = new Date(Date.now())
-  const dateLocal = dateStamp.toLocaleString('en-US');
-  console.log(dateLocal)
+  const short = generateRandomString();
+  const dateStamp = new Date(Date.now())
+  const dateFormatted = dateStamp.toLocaleString('en-US');
   urlDatabase[short] = {
     userID : userKey,
     longURL : req.body.longURL,
-    dateLocal,
+    dateFormatted,
   };
   res.redirect(`/urls/${short}`);
 });
