@@ -72,10 +72,10 @@ app.post('/logout', (req, res) => {
 app.get('/urls', (req, res) => { // => page displaying urls
   let userKey = req.session.user_id;
   if (!userKey) {
-    res.redirect('/login')
+    res.redirect('/login');
   } else {
     let userID = users[userKey].id;
-    let userURLS = urlsForUser(userID, urlDatabase)
+    let userURLS = urlsForUser(userID, urlDatabase);
     const templateVars = {
       userID,
       urls: userURLS
@@ -122,7 +122,7 @@ app.post("/urls", (req, res) => {
   urlDatabase[short] = {
     userID : userKey,
     longURL : req.body.longURL,
-  }
+  };
   res.redirect(`/urls/${short}`);
 });
 
@@ -177,7 +177,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
     delete urlDatabase[req.params.shortURL];
     res.redirect('/urls');
   } else {
-    res.send('not the owner: cannot delete.')
+    res.send('not the owner: cannot delete.');
   }
 });
 
