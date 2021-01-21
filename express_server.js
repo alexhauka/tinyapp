@@ -58,9 +58,9 @@ app.post('/login', (req, res) => {
   const userInfo = getUserByEmail(req.body.email, users);
   // console.log(userInfo)
   if (userInfo.email !== req.body.email) {
-    res.status(403).send('that email is not in our database.');
+    res.sendStatus(403);
   } else if (!bcrypt.compareSync(req.body.password, userInfo.password)) {
-    res.status(403).send('password does not match!');
+    res.sendStatus(403);
   } else if (bcrypt.compareSync(req.body.password, userInfo.password)) {
     req.session.user_id = userInfo.id;
     res.redirect('/urls');
@@ -103,9 +103,9 @@ app.get('/register', (req, res) => {
 
 app.post('/register', (req, res) => {
   if (getUserByEmail(req.body.email, users)) {
-    res.status(400).send('that email already exists!');
+    res.sendStatus(400);
   } else if (req.body.email === "" || req.body.password === "") {
-    res.status(400).send('email and password cannot be empty!');
+    res.sendStatus(400);
   } else {
     const randomID = generateRandomString();
     const password = req.body.password;
