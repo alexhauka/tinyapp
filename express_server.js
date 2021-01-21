@@ -33,6 +33,16 @@ const generateRandomString = function() { // => used for generating 6 char rando
   return Math.floor((1 + Math.random()) * 0x100000).toString(16);
 };
 
+const urlsForUser = function(id) {
+  let output = {}
+  for (const url in urlDatabase) {
+    if (urlDatabase[url].userID === id) {
+      output[url] = urlDatabase[url]
+    }
+  }
+  return output;
+}
+
 
 const getUserByEmail = function(email) { // => returns user object with related info
   for (const user in users) {
@@ -77,14 +87,21 @@ app.post('/logout', (req, res) => {
   res.redirect('/urls');
 });
 
+
+
 app.get('/urls', (req, res) => { // => page displaying urls
   let user = req.cookies['user_id'];
-  let userID = users[user];
-  const templateVars = {
-    userID,
-    urls: urlDatabase
-  };
-  res.render('urls_index', templateVars);
+  if (!user) {
+    res.redirect('/login')
+  } else {
+    let userID = users[user].id;
+    let userURLS = urlsForUser(userID)
+    const templateVars = {
+      userID,
+      urls: userURLS
+    };
+    res.render('urls_index', templateVars);
+  }
 });
 
 app.get('/register', (req, res) => {
@@ -116,10 +133,6 @@ app.post('/register', (req, res) => {
     res.redirect('/urls');
   }
 });
-
-
-
-
 
 
 app.post("/urls", (req, res) => {
@@ -179,3 +192,7 @@ app.get('/urls.json', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
+
+//---------------TO DO:---------------
+// RENAME VARIABLES THAT OVERLAP (userID in cookie handling 'laps with userID key in user object) THIS WILL BREAK EVERTHIIIIIIIING
