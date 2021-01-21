@@ -13,10 +13,10 @@ const urlsForUser = function(id, db) {
 };
 
 
-const getUserByEmail = function(email, db) { // => returns user object with related info
+const getUserByEmail = function(searchEmail, db) { // => returns user object with related info
   for (const user in db) {
-    if (db[user].email === email) {
-      return db[user];
+    if (db[user].email === searchEmail) {
+      return user;
     }
   }
 };

@@ -21,16 +21,19 @@ const urlDatabase = {
   "9sm5xK": { longURL: "http://www.google.com", userID: "user2RandomID" }
 };
 
+
+const testPassword1 = bcrypt.hashSync("purple-monkey-dinosaur", 10)
+const testPassword2 = bcrypt.hashSync("dishwasher-funk", 10)
 const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur"
+    password: testPassword1
   },
   "user2RandomID": {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk"
+    password: testPassword2
   }
 };
 
@@ -38,32 +41,36 @@ const users = {
 
 app.get('/', (req, res) => { // => registers handler on root path ('/')
   if (req.session.user_id) {
-    res.redirect('/urls');
+    return res.redirect('/urls');
   } else {
-    res.redirect('/login')
+    return res.redirect('/login')
   }
 });
 
-app.get('/login', (req, res) => {
-  let userKey = req.session.user_id;
-  let userID = users[userKey];
+
+// THIS ONE IS BEST, USE AS MODEL FOR REST
+app.get('/login', (req, res) => {  // => template vars defaults to undefined if server is reset
   const templateVars = {
-    userID,
+    userID: undefined,
     urls: urlDatabase
   };
-  res.render('urls_login', templateVars);
+  if (req.session.user_id) {
+    templateVars.userID = users[req.session.user_id] // => sets the userID to matching cookie for session
+    return res.render('urls_login', templateVars);
+  } else {
+    return res.render('urls_login', templateVars)
+  }
 });
 
 app.post('/login', (req, res) => {
   const userInfo = getUserByEmail(req.body.email, users);
-  // console.log(userInfo)
-  if (userInfo.email !== req.body.email) {
-    res.sendStatus(403);
-  } else if (!bcrypt.compareSync(req.body.password, userInfo.password)) {
-    res.sendStatus(403);
-  } else if (bcrypt.compareSync(req.body.password, userInfo.password)) {
-    req.session.user_id = userInfo.id;
-    res.redirect('/urls');
+  if (users[userInfo].email !== req.body.email) {
+    return res.sendStatus(403);
+  } else if (!bcrypt.compareSync(req.body.password, users[userInfo].password)) {
+    return res.sendStatus(403);
+  } else if (bcrypt.compareSync(req.body.password, users[userInfo].password)) {
+    req.session.user_id = users[userInfo].id;
+    return res.redirect('/urls');
   }
 });
 
