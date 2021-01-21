@@ -1,8 +1,9 @@
 const express = require('express');
-const app = express();
-const PORT = 8080;
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcrypt');
+const app = express();
+const PORT = 8080;
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
@@ -123,10 +124,12 @@ app.post('/register', (req, res) => {
     res.status(400).send('email or password cannot be empty!');
   } else {
     const randomID = generateRandomString();
+    const password = req.body.password;
+    const hashedPassword = bcrypt.hashSync(password, 10);
     users[randomID] = {
       id: randomID,
       email: req.body.email,
-      password: req.body.password
+      password: hashedPassword
     };
     res.cookie('user_id', randomID);
     // console.log(users)
