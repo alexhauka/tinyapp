@@ -36,7 +36,11 @@ const users = {
 
 
 app.get('/', (req, res) => { // => registers handler on root path ('/')
-  res.send('Tiny URL Project root page!');
+  if (req.session.user_id) {
+    res.redirect('/urls');
+  } else {
+    res.redirect('/login')
+  }
 });
 
 app.get('/login', (req, res) => {
