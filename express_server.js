@@ -132,6 +132,46 @@ app.post("/urls", (req, res) => {
   }
 });
 
+app.post('/urls/:shortURL', (req, res) => {
+  if (!req.session.user_id) {
+    return res.sendStatus(403);
+  } else {
+    let userKey = req.session.user_id;
+    let searchID = users[userKey].id;
+    let userURLS = urlsForUser(searchID, urlDatabase);
+    if (!userURLS[req.params.shortURL]) {
+      return res.sendStatus(403);
+    } else {
+      urlDatabase[req.params.shortURL].longURL = req.body.longURL;
+      return res.redirect('/urls');
+    }
+  }
+});
+
+// app.get('/urls/:shortURL', (req, res) => {
+//   let userKey = req.session.user_id;
+//   if (!userKey) {
+//     res.redirect('/login');
+//   } else if (!urlDatabase[req.params.shortURL]) {
+//     return res.sendStatus(404);
+//   }  else {
+//     let searchID = users[userKey].id;
+//     let userURLS = urlsForUser(searchID, urlDatabase);
+//     if (!userURLS[req.params.shortURL]) {
+//       return res.sendStatus(403);
+//     } else {
+//       const templateVars = {
+//         userID : users[userKey],
+//         urls: userURLS,
+//         shortURL: req.params.shortURL,
+//         longURL: urlDatabase[req.params.shortURL],
+//         dateFormatted: urlDatabase[req.params.shortURL].dateFormatted
+//       };
+//       return res.render('urls_show', templateVars);
+//     }
+//   }
+// });
+
 
 // THIS ONE IS BEST, USE AS MODEL FOR REST
 app.get('/login', (req, res) => {  // => template vars defaults to undefined if server is reset
@@ -207,10 +247,7 @@ app.post('/register', (req, res) => {
 
 
 
-app.post('/urls/:shortURL', (req, res) => {
-  urlDatabase[req.params.shortURL].longURL = req.body.longURL;
-  res.redirect('/urls');
-});
+
 
 
 
