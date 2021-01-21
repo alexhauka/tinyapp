@@ -95,7 +95,7 @@ app.get('/urls', (req, res) => { // => page displaying urls
   if (!user) {
     res.redirect('/login')
   } else {
-    let userID = users[user];
+    let userID = users[user].id;
     let userURLS = urlsForUser(userID)
     const templateVars = {
       userID,
@@ -144,7 +144,6 @@ app.post("/urls", (req, res) => {
     userID : user,
     longURL : req.body.longURL,
   }
-  console.log(urlDatabase[short])
   res.redirect(`/urls/${short}`);
 });
 
