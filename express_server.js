@@ -86,6 +86,8 @@ app.get('/urls/:shortURL', (req, res) => {
   let userKey = req.session.user_id;
   if (!userKey) {
     res.redirect('/login');
+  } else if (!urlDatabase[req.params.shortURL]) {
+    return res.sendStatus(404);
   } else {
     let searchID = users[userKey].id;
     let userURLS = urlsForUser(searchID, urlDatabase);
@@ -98,6 +100,7 @@ app.get('/urls/:shortURL', (req, res) => {
     };
     res.render('urls_show', templateVars);
   }
+
 });
 
 
@@ -211,6 +214,8 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
 });
+
+
 
 
 app.get('*', (req, res) => {
