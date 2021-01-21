@@ -75,9 +75,9 @@ app.post('/login', (req, res) => {
   const userInfo = getUserByEmail(req.body.email);
   if (!getUserByEmail(req.body.email)) {
     res.status(403).send('that email is not in our database.');
-  } else if (userInfo.password !== req.body.password) {
+  } else if (!bcrypt.compareSync(req.body.password, userInfo.password)) {
     res.status(403).send('password does not match!');
-  } else if (userInfo.password === req.body.password) {
+  } else if (bcrypt.compareSync(req.body.password, userInfo.password)) {
     res.cookie('user_id', userInfo.id);
     res.redirect('/urls');
   }
@@ -95,7 +95,7 @@ app.get('/urls', (req, res) => { // => page displaying urls
   if (!user) {
     res.redirect('/login')
   } else {
-    let userID = users[user].id;
+    let userID = users[user];
     let userURLS = urlsForUser(userID)
     const templateVars = {
       userID,
@@ -132,15 +132,19 @@ app.post('/register', (req, res) => {
       password: hashedPassword
     };
     res.cookie('user_id', randomID);
-    // console.log(users)
     res.redirect('/urls');
   }
 });
 
 
 app.post("/urls", (req, res) => {
+  let user = req.cookies['user_id'];
   let short = generateRandomString();
-  urlDatabase[short] = req.body.longURL;
+  urlDatabase[short] = {
+    userID : user,
+    longURL : req.body.longURL,
+  }
+  console.log(urlDatabase[short])
   res.redirect(`/urls/${short}`);
 });
 
