@@ -101,10 +101,35 @@ app.get('/urls/:shortURL', (req, res) => {
         longURL: urlDatabase[req.params.shortURL],
         dateFormatted: urlDatabase[req.params.shortURL].dateFormatted
       };
-      res.render('urls_show', templateVars);
+      return res.render('urls_show', templateVars);
     }
   }
+});
 
+app.get("/u/:shortURL", (req, res) => {
+  if (!urlDatabase[req.params.shortURL]) {
+    return res.sendStatus(404);
+  } else {
+    const longURL = urlDatabase[req.params.shortURL].longURL;
+    return res.redirect(longURL);
+  };
+});
+
+app.post("/urls", (req, res) => {
+  if (!req.session.user_id) {
+    return res.sendStatus(403);
+  } else {
+    let userKey = req.session.user_id;
+    const short = generateRandomString();
+    const dateStamp = new Date(Date.now())
+    const dateFormatted = dateStamp.toLocaleString('en-US');
+    urlDatabase[short] = {
+      userID : userKey,
+      longURL : req.body.longURL,
+      dateFormatted,
+    };
+    res.redirect(`/urls/${short}`);
+  }
 });
 
 
@@ -175,26 +200,12 @@ app.post('/register', (req, res) => {
 });
 
 
-app.post("/urls", (req, res) => {
-  let userKey = req.session.user_id;
-  const short = generateRandomString();
-  const dateStamp = new Date(Date.now())
-  const dateFormatted = dateStamp.toLocaleString('en-US');
-  urlDatabase[short] = {
-    userID : userKey,
-    longURL : req.body.longURL,
-    dateFormatted,
-  };
-  res.redirect(`/urls/${short}`);
-});
 
 
 
 
-app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL].longURL;
-  res.redirect(longURL);
-});
+
+
 
 app.post('/urls/:shortURL', (req, res) => {
   urlDatabase[req.params.shortURL].longURL = req.body.longURL;
