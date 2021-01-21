@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require("body-parser");
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
+const { generateRandomString, urlsForUser, getUserByEmail } = require('./helpers');
 const app = express();
 const PORT = 8080;
 
@@ -31,33 +32,6 @@ const users = {
     password: "dishwasher-funk"
   }
 };
-
-// ----------------Helpers-----------------:
-
-const generateRandomString = function() { // => used for generating 6 char random string to assign as user id in database
-  return Math.floor((1 + Math.random()) * 0x100000).toString(16);
-};
-
-const urlsForUser = function(id) {
-  let output = {}
-  for (const url in urlDatabase) {
-    if (urlDatabase[url].userID === id) {
-      output[url] = urlDatabase[url]
-    }
-  }
-  return output;
-}
-
-
-const getUserByEmail = function(email, db) { // => returns user object with related info
-  for (const user in db) {
-    if (db[user].email === email) {
-      return db[user];
-    }
-  }
-};
-
-// ----------------------------------------:
 
 
 
@@ -101,7 +75,7 @@ app.get('/urls', (req, res) => { // => page displaying urls
     res.redirect('/login')
   } else {
     let userID = users[userKey].id;
-    let userURLS = urlsForUser(userID)
+    let userURLS = urlsForUser(userID, urlDatabase)
     const templateVars = {
       userID,
       urls: userURLS
@@ -183,7 +157,7 @@ app.get('/urls/:shortURL', (req, res) => {
     res.redirect('/login');
   } else {
     let searchID = users[userKey].id;
-    let userURLS = urlsForUser(searchID);
+    let userURLS = urlsForUser(searchID, urlDatabase);
     const templateVars = {
       userID : users[userKey],
       urls: userURLS,
@@ -198,7 +172,7 @@ app.get('/urls/:shortURL', (req, res) => {
 app.post('/urls/:shortURL/delete', (req, res) => {
   let user = req.session.user_id;
   let searchID = users[user].id;
-  let userURLS = urlsForUser(searchID);
+  let userURLS = urlsForUser(searchID, urlDatabase);
   if (user === userURLS[req.params.shortURL].userID) {
     delete urlDatabase[req.params.shortURL];
     res.redirect('/urls');
