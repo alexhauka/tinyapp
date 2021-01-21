@@ -88,17 +88,21 @@ app.get('/urls/:shortURL', (req, res) => {
     res.redirect('/login');
   } else if (!urlDatabase[req.params.shortURL]) {
     return res.sendStatus(404);
-  } else {
+  }  else {
     let searchID = users[userKey].id;
     let userURLS = urlsForUser(searchID, urlDatabase);
-    const templateVars = {
-      userID : users[userKey],
-      urls: userURLS,
-      shortURL: req.params.shortURL,
-      longURL: urlDatabase[req.params.shortURL],
-      dateFormatted: urlDatabase[req.params.shortURL].dateFormatted
-    };
-    res.render('urls_show', templateVars);
+    if (!userURLS[req.params.shortURL]) {
+      return res.sendStatus(403);
+    } else {
+      const templateVars = {
+        userID : users[userKey],
+        urls: userURLS,
+        shortURL: req.params.shortURL,
+        longURL: urlDatabase[req.params.shortURL],
+        dateFormatted: urlDatabase[req.params.shortURL].dateFormatted
+      };
+      res.render('urls_show', templateVars);
+    }
   }
 
 });
@@ -120,7 +124,7 @@ app.get('/login', (req, res) => {  // => template vars defaults to undefined if 
 
 app.post('/login', (req, res) => {
   const userInfo = getUserByEmail(req.body.email, users);
-  if (users[userInfo].email !== req.body.email) {
+  if (!userInfo || users[userInfo].email !== req.body.email) {
     return res.sendStatus(403);
   } else if (!bcrypt.compareSync(req.body.password, users[userInfo].password)) {
     return res.sendStatus(403);
