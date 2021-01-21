@@ -165,8 +165,6 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 });
 
 
-
-// THIS ONE IS BEST, USE AS MODEL FOR REST
 app.get('/login', (req, res) => {  // => template vars defaults to undefined if server is reset
   const templateVars = {
     userID: undefined,
@@ -174,9 +172,20 @@ app.get('/login', (req, res) => {  // => template vars defaults to undefined if 
   };
   if (req.session.user_id) {
     templateVars.userID = users[req.session.user_id] // => sets the userID to matching cookie for session
-    return res.render('urls_login', templateVars);
+    return res.redirect('/urls');
   } else {
     return res.render('urls_login', templateVars)
+  }
+});
+
+app.get('/register', (req, res) => {
+  if (req.session.user_id) {
+    return res.redirect('/urls');
+  } else {
+    const templateVars = {
+      userID: undefined,
+    };
+    return res.render('urls_register', templateVars);
   }
 });
 
@@ -201,15 +210,7 @@ app.post('/logout', (req, res) => {
 
 
 
-app.get('/register', (req, res) => {
-  let userKey = req.session.user_id;
-  let userID = users[userKey];
-  const templateVars = {
-    userID,
-    // urls: urlDatabase
-  };
-  res.render('urls_register', templateVars);
-});
+
 
 
 
