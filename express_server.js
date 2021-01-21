@@ -7,7 +7,8 @@ const PORT = 8080;
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
-  name: 'session'
+  name: 'session',
+  keys: ['key1']
 }));
 
 app.set('view engine', 'ejs');
@@ -65,8 +66,8 @@ app.get('/', (req, res) => { // => registers handler on root path ('/')
 });
 
 app.get('/login', (req, res) => {
-  let user = req.cookies['user_id'];
-  let userID = users[user];
+  let userKey = req.session.user_id;
+  let userID = users[userKey];
   const templateVars = {
     userID,
     urls: urlDatabase
@@ -81,24 +82,24 @@ app.post('/login', (req, res) => {
   } else if (!bcrypt.compareSync(req.body.password, userInfo.password)) {
     res.status(403).send('password does not match!');
   } else if (bcrypt.compareSync(req.body.password, userInfo.password)) {
-    res.cookie('user_id', userInfo.id);
+    req.session.user_id = userInfo.id;
     res.redirect('/urls');
   }
 });
 
 app.post('/logout', (req, res) => {
-  res.clearCookie('user_id', req.cookies);
+  req.session = null;
   res.redirect('/urls');
 });
 
 
 
 app.get('/urls', (req, res) => { // => page displaying urls
-  let user = req.cookies['user_id'];
-  if (!user) {
+  let userKey = req.session.user_id;
+  if (!userKey) {
     res.redirect('/login')
   } else {
-    let userID = users[user].id;
+    let userID = users[userKey].id;
     let userURLS = urlsForUser(userID)
     const templateVars = {
       userID,
@@ -109,11 +110,11 @@ app.get('/urls', (req, res) => { // => page displaying urls
 });
 
 app.get('/register', (req, res) => {
-  let user = req.cookies['user_id'];
-  let userID = users[user];
+  let userKey = req.session.user_id;
+  let userID = users[userKey];
   const templateVars = {
     userID,
-    urls: urlDatabase
+    // urls: urlDatabase
   };
   res.render('urls_register', templateVars);
 });
@@ -134,26 +135,26 @@ app.post('/register', (req, res) => {
       email: req.body.email,
       password: hashedPassword
     };
-    res.cookie('user_id', randomID);
+    req.session.user_id = randomID;
     res.redirect('/urls');
   }
 });
 
 
 app.post("/urls", (req, res) => {
-  let user = req.cookies['user_id'];
+  let userKey = req.session.user_id;
   let short = generateRandomString();
   urlDatabase[short] = {
-    userID : user,
+    userID : userKey,
     longURL : req.body.longURL,
   }
   res.redirect(`/urls/${short}`);
 });
 
 app.get('/urls/new', (req, res) => {
-  let user = req.cookies['user_id'];
-  let userID = users[user];
-  if (!userID) {
+  let userKey = req.session.user_id;
+  let userID = users[userKey];
+  if (!userKey) {
     res.redirect('/login');
   } else {
     const templateVars = {
@@ -176,14 +177,14 @@ app.post('/urls/:shortURL', (req, res) => {
 });
 
 app.get('/urls/:shortURL', (req, res) => {
-  let user = req.cookies['user_id'];
-  if (!user) {
+  let userKey = req.session.user_id;
+  if (!userKey) {
     res.redirect('/login');
   } else {
-    let userID = users[user].id;
-    let userURLS = urlsForUser(userID);
+    let searchID = users[userKey].id;
+    let userURLS = urlsForUser(searchID);
     const templateVars = {
-      userID,
+      userID : users[userKey],
       urls: userURLS,
       shortURL: req.params.shortURL,
       longURL: urlDatabase[req.params.shortURL],
@@ -194,10 +195,10 @@ app.get('/urls/:shortURL', (req, res) => {
 
 
 app.post('/urls/:shortURL/delete', (req, res) => {
-  let user = req.cookies['user_id'];
-  let userID = users[user].id;
-  let userURLS = urlsForUser(userID);
-  if (userID === userURLS[req.params.shortURL].userID) {
+  let user = req.session.user_id;
+  let searchID = users[user].id;
+  let userURLS = urlsForUser(searchID);
+  if (user === userURLS[req.params.shortURL].userID) {
     delete urlDatabase[req.params.shortURL];
     res.redirect('/urls');
   } else {
@@ -215,4 +216,4 @@ app.listen(PORT, () => {
 
 
 //---------------TO DO:---------------
-// RENAME VARIABLES THAT OVERLAP (userID in cookie handling 'laps with userID key in user object) THIS WILL BREAK EVERTHIIIIIIIING
+// change page templates to hide or show pertinent info depending on session status
