@@ -1,11 +1,10 @@
+const { generateRandomString, urlsForUser, getUserByEmail } = require('./helpers');
 const express = require('express');
 const bodyParser = require("body-parser");
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
-const { generateRandomString, urlsForUser, getUserByEmail } = require('./helpers');
 const app = express();
 const PORT = 8080;
-// const dateOptions = {day: 'numeric', month: 'numeric', year: 'numeric'};
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
@@ -21,9 +20,10 @@ const urlDatabase = {
   "9sm5xK": { longURL: "http://www.google.com", userID: "user2RandomID" }
 };
 
-
+// for logging in with test accounts:
 const testPassword1 = bcrypt.hashSync("purple-monkey-dinosaur", 10)
 const testPassword2 = bcrypt.hashSync("dishwasher-funk", 10)
+// two test accounts:
 const users = {
   "userRandomID": {
     id: "userRandomID",
@@ -44,6 +44,53 @@ app.get('/', (req, res) => { // => registers handler on root path ('/')
     return res.redirect('/urls');
   } else {
     return res.redirect('/login')
+  }
+});
+
+app.get('/urls', (req, res) => { // => page displaying urls
+  let userKey = req.session.user_id;
+  if (!userKey) {
+    return res.redirect('/login');
+  } else {
+    let userID = users[userKey].id;
+    let userURLS = urlsForUser(userID, urlDatabase);
+    const templateVars = {
+      userID,
+      urls: userURLS
+    };
+    return res.render('urls_index', templateVars);
+  }
+});
+
+app.get('/urls/new', (req, res) => {
+  let userKey = req.session.user_id;
+  let userID = users[userKey];
+  if (!userKey) {
+    res.redirect('/login');
+  } else {
+    const templateVars = {
+      userID,
+      urls: urlDatabase
+    };
+    res.render('urls_new', templateVars);
+  }
+});
+
+
+app.get('/urls/:shortURL', (req, res) => {
+  let userKey = req.session.user_id;
+  if (!userKey) {
+    res.redirect('/login');
+  } else {
+    let searchID = users[userKey].id;
+    let userURLS = urlsForUser(searchID, urlDatabase);
+    const templateVars = {
+      userID : users[userKey],
+      urls: userURLS,
+      shortURL: req.params.shortURL,
+      longURL: urlDatabase[req.params.shortURL],
+    };
+    res.render('urls_show', templateVars);
   }
 });
 
@@ -81,20 +128,7 @@ app.post('/logout', (req, res) => {
 
 
 
-app.get('/urls', (req, res) => { // => page displaying urls
-  let userKey = req.session.user_id;
-  if (!userKey) {
-    return res.redirect('/login');
-  } else {
-    let userID = users[userKey].id;
-    let userURLS = urlsForUser(userID, urlDatabase);
-    const templateVars = {
-      userID,
-      urls: userURLS
-    };
-    return res.render('urls_index', templateVars);
-  }
-});
+
 
 app.get('/register', (req, res) => {
   let userKey = req.session.user_id;
@@ -141,19 +175,7 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${short}`);
 });
 
-app.get('/urls/new', (req, res) => {
-  let userKey = req.session.user_id;
-  let userID = users[userKey];
-  if (!userKey) {
-    res.redirect('/login');
-  } else {
-    const templateVars = {
-      userID,
-      urls: urlDatabase
-    };
-    res.render('urls_new', templateVars);
-  }
-});
+
 
 
 app.get("/u/:shortURL", (req, res) => {
@@ -166,22 +188,6 @@ app.post('/urls/:shortURL', (req, res) => {
   res.redirect('/urls');
 });
 
-app.get('/urls/:shortURL', (req, res) => {
-  let userKey = req.session.user_id;
-  if (!userKey) {
-    res.redirect('/login');
-  } else {
-    let searchID = users[userKey].id;
-    let userURLS = urlsForUser(searchID, urlDatabase);
-    const templateVars = {
-      userID : users[userKey],
-      urls: userURLS,
-      shortURL: req.params.shortURL,
-      longURL: urlDatabase[req.params.shortURL],
-    };
-    res.render('urls_show', templateVars);
-  }
-});
 
 
 app.post('/urls/:shortURL/delete', (req, res) => {
@@ -211,4 +217,5 @@ app.listen(PORT, () => {
 
 
 //---------------TO DO:---------------
-// change page templates to hide or show pertinent info depending on session status
+// change page templates to hide or show pertinent info depending on session status?
+// redesign header
