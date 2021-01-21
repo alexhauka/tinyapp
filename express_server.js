@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const { generateRandomString, urlsForUser, getUserByEmail } = require('./helpers');
 const app = express();
 const PORT = 8080;
+// const dateOptions = {day: 'numeric', month: 'numeric', year: 'numeric'};
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
@@ -76,7 +77,7 @@ app.post('/logout', (req, res) => {
 app.get('/urls', (req, res) => { // => page displaying urls
   let userKey = req.session.user_id;
   if (!userKey) {
-    res.redirect('/login');
+    return res.redirect('/login');
   } else {
     let userID = users[userKey].id;
     let userURLS = urlsForUser(userID, urlDatabase);
@@ -84,7 +85,7 @@ app.get('/urls', (req, res) => { // => page displaying urls
       userID,
       urls: userURLS
     };
-    res.render('urls_index', templateVars);
+    return res.render('urls_index', templateVars);
   }
 });
 
@@ -123,9 +124,13 @@ app.post('/register', (req, res) => {
 app.post("/urls", (req, res) => {
   let userKey = req.session.user_id;
   let short = generateRandomString();
+  let dateStamp = new Date(Date.now())
+  const dateLocal = dateStamp.toLocaleString('en-US');
+  console.log(dateLocal)
   urlDatabase[short] = {
     userID : userKey,
     longURL : req.body.longURL,
+    dateLocal,
   };
   res.redirect(`/urls/${short}`);
 });
@@ -188,6 +193,11 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
 });
+
+
+app.get('*', (req, res) => {
+  return res.redirect('/login')
+})
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
