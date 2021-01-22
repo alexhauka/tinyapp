@@ -2,7 +2,7 @@ const generateRandomString = function() { // => used for generating 6 char rando
   return Math.floor((1 + Math.random()) * 0x100000).toString(16);
 };
 
-const urlsForUser = function(id, db) {
+const urlsForUser = function(id, db) { // => returns an object with users owned URLs
   let output = {};
   for (const url in db) {
     if (db[url].userID === id) {
@@ -13,7 +13,7 @@ const urlsForUser = function(id, db) {
 };
 
 
-const getUserByEmail = function(searchEmail, db) { // => returns user object with related info
+const getUserByEmail = function(searchEmail, db) { // => returns user object with account info
   for (const user in db) {
     if (db[user].email === searchEmail) {
       return user;
