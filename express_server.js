@@ -127,7 +127,7 @@ app.get("/u/:shortURL", (req, res) => {
     if (req.session.user_id) {
       const uniqueUser = req.session.user_id;
       if (!uniqueUserDatabase[uniqueUser]) {
-        uniqueUserDatabase[uniqueUser]= uniqueUser;
+        uniqueUserDatabase[uniqueUser] = uniqueUser;
         urlDatabase[req.params.shortURL].uniqueVisits += 1;
       }
     }
@@ -147,6 +147,8 @@ app.post("/urls", (req, res) => {
       userID : userKey,
       longURL : req.body.longURL,
       dateFormatted,
+      totalVisits: 0,
+      uniqueVisits: 0
     };
     res.redirect(`/urls/${short}`);
   }
