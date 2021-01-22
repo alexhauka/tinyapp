@@ -12,7 +12,7 @@
       <div class='card-header'></div>
       <div class='card-body'>
         <h5 class='card-title'><b>TinyURL for: </b><a href='<%= urls[shortURL].longURL %>'><%= urls[shortURL].longURL %></a></h5>
-        <p class='card-text'>Short URL: <a href='<%= urls[shortURL].longURL %>'><%= shortURL %></a></p>
+        <p class='card-text'>Short URL: <a href='/u/<%=shortURL%>'><%= shortURL %></a></p>
         <p class="card-text">Created: <%= dateFormatted %></p>
         <p class="card-text">Total Visits: <%= urls[shortURL].totalVisits %></p>
         <p class='card-text'>Unique Visits: <%= urls[shortURL].uniqueVisits %></p>
@@ -21,14 +21,14 @@
       <thead>
         <tr>
           <th scope='col'>Time Visited</th>
-          <th scope='col'>Visitor ID</th>
+          <th scope='col'>Visitor</th>
         </tr>
       </thead>
       <tbody>
-        <% for(let time in visitors) { %>
+        <% for(let info in visitors) { %>
           <tr>
-            <td><%= time %></td>
-            <td><%= visitors[time] %></td>
+            <td><p><%= visitors[info] %></p></td>
+            <td><p><%= info %></p></td>
           </tr>
         <% } %>
       </tbody>
