@@ -1,12 +1,14 @@
 const { generateRandomString, urlsForUser, getUserByEmail } = require('./helpers');
 const cookieSession = require('cookie-session');
-const express = require('express');
 const bodyParser = require("body-parser");
+const express = require('express');
+const methodOverride = require('method-override');
 const bcrypt = require('bcrypt');
 
 const app = express();
 const PORT = 8080;
 
+app.use(methodOverride('_method'));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
   name: 'session',
