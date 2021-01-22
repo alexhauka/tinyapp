@@ -125,7 +125,7 @@ app.get("/u/:shortURL", (req, res) => { // => path for the shortURL; triggers re
     if (!req.session.user_id) {
       visitorID = generateRandomString(); // => generates ID for non-users
     } else {
-      visitorID = req.session.user_id // => uses user ID if logged in
+      visitorID = req.session.user_id; // => uses user ID if logged in
     }
     urlDatabase[short].visitors[visitorID] = time; // => user and timestamp for analytics
     urlDatabase[req.params.shortURL].totalVisits += 1;
@@ -140,7 +140,7 @@ app.get("/u/:shortURL", (req, res) => { // => path for the shortURL; triggers re
     return res.redirect(longURL);
   }
 });
-app.post("/urls", (req, res) => { // => creates new shortURL 
+app.post("/urls", (req, res) => { // => creates new shortURL
   if (!req.session.user_id) {
     return res.status(403).send('You must be logged in to add a URL.'); // => if not logged in, sends 403
   } else {
