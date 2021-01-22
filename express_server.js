@@ -60,8 +60,6 @@ app.get('/', (req, res) => { // => registers handler on root path ('/')
     return res.redirect('/login');
   }
 });
-
-
 app.get('/urls', (req, res) => { // => page displaying urls
   let userKey = req.session.user_id;
   if (!userKey) {
@@ -76,8 +74,6 @@ app.get('/urls', (req, res) => { // => page displaying urls
     return res.render('urls_index', templateVars);
   }
 });
-
-
 app.get('/urls/new', (req, res) => {
   let userKey = req.session.user_id;
   let userID = users[userKey];
@@ -91,8 +87,6 @@ app.get('/urls/new', (req, res) => {
     return res.render('urls_new', templateVars);
   }
 });
-
-
 app.get('/urls/:shortURL', (req, res) => {
   let userKey = req.session.user_id;
   if (!userKey) {
@@ -116,8 +110,6 @@ app.get('/urls/:shortURL', (req, res) => {
     }
   }
 });
-
-
 app.get("/u/:shortURL", (req, res) => {
   if (!urlDatabase[req.params.shortURL]) {
     return res.sendStatus(404);
@@ -126,8 +118,6 @@ app.get("/u/:shortURL", (req, res) => {
     return res.redirect(longURL);
   }
 });
-
-
 app.post("/urls", (req, res) => {
   if (!req.session.user_id) {
     return res.sendStatus(403);
@@ -144,9 +134,7 @@ app.post("/urls", (req, res) => {
     res.redirect(`/urls/${short}`);
   }
 });
-
-
-app.post('/urls/:shortURL', (req, res) => {
+app.put('/urls/:shortURL', (req, res) => { // edits the short url's long url
   if (!req.session.user_id) {
     return res.sendStatus(403);
   } else {
@@ -161,9 +149,7 @@ app.post('/urls/:shortURL', (req, res) => {
     }
   }
 });
-
-
-app.post('/urls/:shortURL/delete', (req, res) => {
+app.delete('/urls/:shortURL', (req, res) => {
   if (!req.session.user_id) {
     return res.sendStatus(403);
   } else {
@@ -178,8 +164,6 @@ app.post('/urls/:shortURL/delete', (req, res) => {
     }
   }
 });
-
-
 app.get('/login', (req, res) => {  // => template vars defaults to undefined if server is reset
   const templateVars = {
     userID: undefined,
@@ -192,8 +176,6 @@ app.get('/login', (req, res) => {  // => template vars defaults to undefined if 
     return res.render('urls_login', templateVars);
   }
 });
-
-
 app.get('/register', (req, res) => {
   if (req.session.user_id) {
     return res.redirect('/urls');
@@ -204,8 +186,6 @@ app.get('/register', (req, res) => {
     return res.render('urls_register', templateVars);
   }
 });
-
-
 app.post('/login', (req, res) => {
   const userInfo = getUserByEmail(req.body.email, users);
   if (!userInfo || users[userInfo].email !== req.body.email) {
@@ -217,8 +197,6 @@ app.post('/login', (req, res) => {
     return res.redirect('/urls');
   }
 });
-
-
 app.post('/register', (req, res) => {
   if (getUserByEmail(req.body.email, users)) {
     return res.sendStatus(400);
@@ -237,24 +215,16 @@ app.post('/register', (req, res) => {
     return res.redirect('/urls');
   }
 });
-
-
 app.post('/logout', (req, res) => {
   req.session = null;
   return res.redirect('/urls');
 });
-
-
 app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
 });
-
-
 app.get('*', (req, res) => {
   return res.redirect('/login');
 });
-
-
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });

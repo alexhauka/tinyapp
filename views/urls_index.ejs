@@ -31,12 +31,12 @@
             <td><%= urls[url].longURL %></td>
             <td><%= urls[url].dateFormatted %></td>
             <td>
-              <form method="GET" action='/urls/<%=url%>'>
+              <form method="GET" action='/urls/<%= url %>?_method=PUT'>
                 <button type="submit" class="btn btn-info">EDIT</button>  
               </form>
             </td>
             <td>
-              <form method="POST" action='/urls/<%=url%>/delete'>
+              <form method="POST" action='/urls/<%= url %>?_method=DELETE'>
                 <button type="submit" class="btn btn-danger">DELETE</button>
               </form>
             </td>
