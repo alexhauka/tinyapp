@@ -27,9 +27,11 @@ const testDateFormatted2 = testDate2.toLocaleString('en-US');
 
 // test database tied to test accounts:
 const urlDatabase = {
-  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID", dateFormatted: testDateFormatted1, totalVisits: 0, uniqueVisits: 0, visitInfo: { timestamps: [], visitorId: ""} },
-  "9sm5xK": { longURL: "http://www.google.com", userID: "user2RandomID", dateFormatted: testDateFormatted2, totalVisits: 0, uniqueVisits: 0, visitInfo: { timestamps: [], visitorId: ""} }
+  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID", dateFormatted: testDateFormatted1, totalVisits: 0, uniqueVisits: 0 },
+  "9sm5xK": { longURL: "http://www.google.com", userID: "user2RandomID", dateFormatted: testDateFormatted2, totalVisits: 0, uniqueVisits: 0 }
 };
+
+
 
 
 // for logging in with test accounts:
@@ -50,6 +52,8 @@ const users = {
     password: testPassword2
   }
 };
+
+const uniqueUserDatabase = {}; // => object to track unique visitors for analytics
 
 
 
@@ -114,6 +118,14 @@ app.get("/u/:shortURL", (req, res) => {
   if (!urlDatabase[req.params.shortURL]) {
     return res.sendStatus(404);
   } else {
+    urlDatabase[req.params.shortURL].totalVisits += 1;
+    if (req.session.user_id) {
+      const uniqueUser = req.session.user_id;
+      if (!uniqueUserDatabase[uniqueUser]) {
+        uniqueUserDatabase[uniqueUser]= uniqueUser;
+        urlDatabase[req.params.shortURL].uniqueVisits += 1;
+      }
+    }
     const longURL = urlDatabase[req.params.shortURL].longURL;
     return res.redirect(longURL);
   }
@@ -234,3 +246,4 @@ app.listen(PORT, () => {
 
 // redesign header end views (make em pretty!)
 // lint all js files
+// make 404 and 403 and 400 status
