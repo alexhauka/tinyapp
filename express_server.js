@@ -55,6 +55,8 @@ const users = {
 
 const uniqueUserDatabase = {}; // => object to track unique visitors for analytics
 
+const visitDatabase = {}; // => object to track visit timestamps and ID for analytics
+
 
 
 app.get('/', (req, res) => { // => registers handler on root path ('/')
@@ -104,6 +106,7 @@ app.get('/urls/:shortURL', (req, res) => {
       return res.sendStatus(403);
     } else {
       const templateVars = {
+        visitors: visitDatabase,
         userID : users[userKey],
         urls: userURLS,
         shortURL: req.params.shortURL,
@@ -118,6 +121,8 @@ app.get("/u/:shortURL", (req, res) => {
   if (!urlDatabase[req.params.shortURL]) {
     return res.sendStatus(404);
   } else {
+    req.session.visitorID = generateRandomString();
+    visitDatabase[new Date(Date.now())] = req.session.visitorID;
     urlDatabase[req.params.shortURL].totalVisits += 1;
     if (req.session.user_id) {
       const uniqueUser = req.session.user_id;

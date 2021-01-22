@@ -16,6 +16,23 @@
         <p class="card-text">Created: <%= dateFormatted %></p>
         <p class="card-text">Total Visits: <%= urls[shortURL].totalVisits %></p>
         <p class='card-text'>Unique Visits: <%= urls[shortURL].uniqueVisits %></p>
+        <h3>Visitor Info</h3>
+    <table class='table'>
+      <thead>
+        <tr>
+          <th scope='col'>Time Visited</th>
+          <th scope='col'>Visitor ID</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for(let time in visitors) { %>
+          <tr>
+            <td><%= time %></td>
+            <td><%= visitors[time] %></td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
       </div>
       <div clss='card-footer text-muted'></div>
     </div>
