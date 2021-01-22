@@ -61,10 +61,10 @@ app.get('/', (req, res) => { // => registers handler on root path ('/')
   }
 });
 app.get('/urls', (req, res) => { // => page displaying urls
-  let userKey = req.session.user_id;
-  if (!userKey) {
+  if (!req.session.user_id) {
     return res.redirect('/login');
   } else {
+    let userKey = req.session.user_id;
     let userID = users[userKey].id;
     let userURLS = urlsForUser(userID, urlDatabase);
     const templateVars = {
