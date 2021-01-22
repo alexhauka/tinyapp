@@ -27,8 +27,8 @@ const testDateFormatted2 = testDate2.toLocaleString('en-US');
 
 // test database tied to test accounts:
 const urlDatabase = {
-  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID", dateFormatted: testDateFormatted1},
-  "9sm5xK": { longURL: "http://www.google.com", userID: "user2RandomID", dateFormatted: testDateFormatted2}
+  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID", dateFormatted: testDateFormatted1, totalVisits: 0, uniqueVisits: 0, visitInfo: { timestamps: [], visitorId: ""} },
+  "9sm5xK": { longURL: "http://www.google.com", userID: "user2RandomID", dateFormatted: testDateFormatted2, totalVisits: 0, uniqueVisits: 0, visitInfo: { timestamps: [], visitorId: ""} }
 };
 
 
